@@ -83,6 +83,8 @@ impl Events {
 }
 
 
+
+
 fn main() -> Result<(), io::Error> { 
     let stdout = io::stdout().into_raw_mode()?;
     let backend = TermionBackend::new(stdout);
@@ -100,34 +102,42 @@ fn main() -> Result<(), io::Error> {
     loop {
         let input = stdin.next();
         if let Some(Ok(key)) = input {
-            match key {
-                Key::Up => {
-                    events.previous();
-
-                },
-                Key::Down =>{
-                    events.next();
-                },
-                Key::Char('q') => {
-                    terminal.clear();
-                    break Ok(());
-                },
-                Key::Char('\n') => {
-                    // println!("{:?}", events);
-                    let i = events.get_selected();
-                    if i == 1{
-                        in_menu=false;
-                        // println!("test")
-                    }else if i == 2{
+            if in_menu {
+                match key {
+                    Key::Up => {
+                        events.previous();
+                    },
+                    Key::Down =>{
+                        events.next();
+                    },
+                    Key::Char('q') => {
                         terminal.clear();
                         break Ok(());
+                    },
+                    Key::Char('\n') => {
+                        let i = events.get_selected();
+                        if i == 1{
+                            in_menu=false;
+                        }else if i == 2{
+                            terminal.clear();
+                            break Ok(());
+                        }
+                    },
+                    _ => {
+                        //Do Nothing
                     }
-                },
-                _ => {
-                    // stdout.lock().flush().unwrap()
-                    //Do Nothing
                 }
-            }
+            } else {
+                match key {
+                    Key::Ctrl('c') => {
+                        terminal.clear();
+                        break Ok(());
+                    },
+                    _ => {
+                        //Do Nothing for now
+                    }
+                }
+            } 
         }
         terminal.draw(|f| {
             if in_menu == true {            
@@ -139,6 +149,7 @@ fn main() -> Result<(), io::Error> {
                     .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
                     .highlight_symbol(">>");
                 f.render_stateful_widget(list, f.size(), &mut events.state);
+
             } else{
                 let chunks = Layout::default()
                     .direction(Direction::Vertical)
@@ -146,22 +157,21 @@ fn main() -> Result<(), io::Error> {
                     .constraints(
                         [
                             Constraint::Percentage(10),
-                            Constraint::Percentage(90),
-                            Constraint::Percentage(10)
+                            Constraint::Percentage(95),
+                            Constraint::Percentage(5)
                         ].as_ref()
                     )
                     .split(f.size());
-                
                 // backend    
                 
                 let block = Block::default()
                     .title("Enter value to be inserted into B+ tree")
                     .borders(Borders::ALL);
                 f.render_widget(block, chunks[0]);
-               
                 let block = Block::default()
-                .title("B+ Tree Viewer")
-                .borders(Borders::ALL);
+                    .title("B+ Tree Viewer")
+                    .borders(Borders::ALL);
+                
                 f.render_widget(block, chunks[1]);
                 f.set_cursor(2,2)
             }
