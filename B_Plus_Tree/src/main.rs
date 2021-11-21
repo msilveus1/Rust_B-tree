@@ -98,6 +98,8 @@ fn main() -> Result<(), io::Error> {
     let mut stdin = termion::async_stdin().keys();
 
     let mut in_menu = true;
+    let mut input_string : String = String::new();
+    let mut x_cursor_pos = 4;
 
     loop {
         let input = stdin.next();
@@ -128,13 +130,35 @@ fn main() -> Result<(), io::Error> {
                     }
                 }
             } else {
+                
+                let mut stdout_2 = io::stdout().into_raw_mode()?;
                 match key {
                     Key::Ctrl('c') => {
                         terminal.clear();
                         break Ok(());
                     },
+                    Key::Char('\n') => {
+                        
+                        //Do nothing for now.
+                    },
                     _ => {
-                        //Do Nothing for now
+                        if  let termion::event::Key::Char(k) = key {
+                            // write!(stdout_2, "\\{}\\",k);
+                            input_string.push(k);
+                            // write!(stdout_2,"\r");
+                            // write!()
+                            // write!(stdout_2,"{}",);
+                            x_cursor_pos=x_cursor_pos+1;
+                            write!(stdout_2,"{}{}{}", cursor::Goto(5,4),cursor::BlinkingBlock,input_string);
+
+                            // cursor::Right(50q);
+                            // write!(stdout_2,)
+                            
+                            // input_string=input_string.push(k);
+
+                            // write!(stdout_2, "{}", input_string).unwrap();
+                        //     stdout_2.lock().flush().unwrap();
+                        }
                     }
                 }
             } 
@@ -173,7 +197,10 @@ fn main() -> Result<(), io::Error> {
                     .borders(Borders::ALL);
                 
                 f.render_widget(block, chunks[1]);
-                f.set_cursor(2,2)
+                // if x_cursor_pos == 2 {
+
+                    f.set_cursor(x_cursor_pos,3);
+                // }                    
             }
         });
 
