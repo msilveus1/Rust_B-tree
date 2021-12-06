@@ -1,4 +1,6 @@
+
 mod leaf;
+use lexical_sort::natural_lexical_cmp;
 
 struct Node{
     number_of_children : i32,
@@ -47,6 +49,14 @@ pub impl Node{
 
     pub fn add_leaf(&self, leaf : Leaf) -> {
         // Have to figure out a good sorting algorithm here for sorting
+        let flat_leaf_list=flatten_node(&self.leaves);
+        flat_leaf_list.sort_by(natural_lexical_cmp)
+        //TODO: improve this algorithm here because this is really bad.
+        new_leaf_structure = Vec::new();
+        for flat_leaf in flat_leaf_list.iter() {
+            new_leaf_structure.push(Leaf::new(flat_leaf));
+        }
+        &self.leaves = new_leaf_structure;
     }
     
     pub fn set_sibling_node(&self, sibling_node : Node) {
@@ -57,5 +67,11 @@ pub impl Node{
         &self.children_nodes = children_nodes;
     }
 
-
+    fn flatten_leaves(leaves : Vec<Leaf>) -> Vec<String> {
+        let flattened_leaves = Vec::new();
+        for leaf in leaves.iter() {
+            flattened_leaves.push(leaf.get_value());
+        }
+        flattened_leaves
+    }
 }
