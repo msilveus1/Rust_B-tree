@@ -27,7 +27,6 @@ pub impl b_plus_tree{
                 let new_child_node_left = Node::new(&self.number_of_children);
                 let new_child_node_right = Node::new(&self.number_of_children);
                 let new_root_node = Node::new(&self.number_of_children);
-                let current_index = 0;
                 new_child_node_left.add_leaves(root_leaves[0..split_leaf_index]);
                 new_child_node_right.add_leaves(root_leaves[split_leaf_index..]);
                 new_child_node_left.set_sibling_node(new_child_node_right)
