@@ -1,7 +1,4 @@
 use std::io;
-
-
-// use termion::clear
 use termion;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
@@ -19,6 +16,8 @@ use tui::layout::{Layout, Constraint, Direction, Alignment,Margin, Rect};
 use tui::style::{Style,Modifier, Color};
 use tui::buffer::{Buffer};
 use std::process;
+pub mod b_plus_tree;
+
 
 struct Events {
     items: Vec<String>,

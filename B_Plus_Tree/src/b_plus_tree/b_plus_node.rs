@@ -67,6 +67,10 @@ pub impl Node{
         &self.children_nodes = children_nodes;
     }
 
+    pub fn has_children(&self) : bool {
+        &self.children_nodes.len() > 0
+    }
+
     fn flatten_leaves(leaves : Vec<Leaf>) -> Vec<String> {
         let flattened_leaves = Vec::new();
         for leaf in leaves.iter() {
