@@ -8,6 +8,7 @@ struct Node{
     children_nodes: Vec<Node>,
     parent_node : Option<Node>,
     linked_sibling: Option<Node>,
+    reverse_sibling: Option<Node>
 }
 
 pub impl Node{
@@ -17,12 +18,21 @@ pub impl Node{
             leaves : Vec::new(),
             children_nodes : Vec::new(),
             parent_node : parent_node,
-            linked_sibling : None
+            linked_sibling : None,
+            reverse_sibling : None
         }
     }
 
     pub fn add_sibling(&self, sibling_node : Node) -> {
         &self.linked_sibling = Some(sibling_node);
+    }
+
+    pub fn set_reverse_sibling(&self, reverse_sibling : Node){
+        &self.reverse_sibling = Some(reverse_sibling);
+    }
+
+    pub fn get_reverse_sibling(&self) -> Node {
+        &self.reverse_sibling.unwrap()
     }
     
     pub fn get_number_of_leaves(&self) => i32 {
@@ -70,12 +80,22 @@ pub impl Node{
     }
     
     pub fn set_sibling_node(&self, sibling_node : Node) {
-        &self.linked_sibling=sibling_node;
+        &self.linked_sibling=Some(sibling_node);
     }
 
     pub fn set_children_nodes(&self, children_nodes : Vec<Node>){
         &self.children_nodes = children_nodes;
     }
+
+    pub fn reset_children_parents(&self) {
+        for child in  &self.children_nodes.iter() {
+            child.set_parent(&self)
+        }
+    }
+
+    pub fn set_parent(&self,parent_node : Node){
+        &self.parent_node = parent_node;
+    }        
 
     pub fn has_children(&self) : bool {
         &self.children_nodes.len() > 0
