@@ -82,6 +82,20 @@ pub impl b_plus_tree{
         }
     }
 
+    pub fn get_tree_as_levels_in_array(&self) -> Vec<Vec<Node>> {
+        let mut current_node = &self.root_node;
+        let mut current_level_array = vec![&self.root_node];
+        let mut b_tree_levels = vec![current_level_array]
+        while(current_node.has_children()){
+            let next_level_array = vec![];
+            for node in current_level_array.iter() {
+                next_level_arrray.append(&node.get_children_nodes());
+            }
+            b_plus_tree.push(next_level_array);
+            current_level_array = next_level_array;
+        }
+        b_plus_tree
+    }
 
 
     fn get_child_index(value : String, flattened_leaves : Vec<String>) -> i32 {
