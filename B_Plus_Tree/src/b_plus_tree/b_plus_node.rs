@@ -43,6 +43,10 @@ pub impl Node{
         &self.children_nodes
     }
 
+    pub fn get_child_by_index(&self, index : i32) -> Node {
+        &self.children_nodes[index]
+    }
+
     pub fn add_leaves(&self, leaves : Vec<Leaf>) -> {
         &self.leaves = leaves;
     }
@@ -69,6 +73,10 @@ pub impl Node{
 
     pub fn has_children(&self) : bool {
         &self.children_nodes.len() > 0
+    }
+
+    pub fn get_flattened_leaves(&self) -> Vec<String> {
+        flatten_leaves(&self.leaves)
     }
 
     fn flatten_leaves(leaves : Vec<Leaf>) -> Vec<String> {
