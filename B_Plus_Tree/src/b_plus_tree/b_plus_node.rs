@@ -6,21 +6,23 @@ struct Node{
     number_of_children : i32,
     leaves : Vec<Leaf>,
     children_nodes: Vec<Node>,
-    linked_sibling: Node,
+    parent_node : Option<Node>,
+    linked_sibling: Option<Node>,
 }
 
 pub impl Node{
-    pub fn new( number_of_children : i32) -> {
+    pub fn new( number_of_children : i32, parent_node : Option<Node>) -> {
         Node {
             number_of_children : number_of_children,
             leaves : Vec::new(),
-            children_nodes: Vec::new(),
+            children_nodes : Vec::new(),
+            parent_node : parent_node,
             linked_sibling : None
         }
     }
 
     pub fn add_sibling(&self, sibling_node : Node) -> {
-        &self.linked_sibling = sibling_node;
+        &self.linked_sibling = Some(sibling_node);
     }
     
     pub fn get_number_of_leaves(&self) => i32 {
@@ -28,7 +30,7 @@ pub impl Node{
     }
     
     pub fn get_sibbling(&self) -> Node {
-        &self.linked_sibling
+        &self.linked_sibling.unwrap()
     }
 
     pub fn get_number_of_children(&self) -> i32{
@@ -45,6 +47,10 @@ pub impl Node{
 
     pub fn get_child_by_index(&self, index : i32) -> Node {
         &self.children_nodes[index]
+    }
+
+    pub fn get_parent_node(&self) -> Node {
+        &self.parent_node.unwrap()
     }
 
     pub fn add_leaves(&self, leaves : Vec<Leaf>) -> {
@@ -73,6 +79,15 @@ pub impl Node{
 
     pub fn has_children(&self) : bool {
         &self.children_nodes.len() > 0
+    }
+
+    pub fn has_parent(&self) : bool {
+        let has_parent = false;
+        match &self.parent_node {
+            None => {  } //Do Nothing
+            Some => has_parent = true
+        }
+        has_parent
     }
 
     pub fn get_flattened_leaves(&self) -> Vec<String> {
