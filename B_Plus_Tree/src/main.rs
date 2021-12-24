@@ -129,7 +129,7 @@ fn main() -> Result<(), io::Error> {
                     }
                 }
             } else {
-                
+                // let mut b_plus_tree = Bj
                 let mut stdout_2 = io::stdout().into_raw_mode()?;
                 match key {
                     Key::Ctrl('c') => {
@@ -137,7 +137,7 @@ fn main() -> Result<(), io::Error> {
                         break Ok(());
                     },
                     Key::Char('\n') => {
-                        
+                        b_plus_tree::new("test",3);
                         //Do nothing for now.
                     },
                     _ => {
