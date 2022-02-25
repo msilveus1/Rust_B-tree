@@ -1,124 +1,179 @@
 
-mod leaf;
-use lexical_sort::natural_lexical_cmp;
+use crate::b_plus_tree::leaf::Leaf;
+use crate::b_plus_tree::lexical_sort::LexicalSort;
 
-struct Node{
-    number_of_children : i32,
+#[derive(Clone,Debug,PartialEq,Eq)]
+pub struct Node{
+    number_of_children : usize,
     leaves : Vec<Leaf>,
     children_nodes: Vec<Node>,
-    parent_node : Option<Node>,
-    linked_sibling: Option<Node>,
-    reverse_sibling: Option<Node>
+    parent_node : Option<Box<Node>>,
+    linked_sibling: Option<Box<Node>>,
+    reverse_sibling: Option<Box<Node>>
 }
 
-pub impl Node{
-    pub fn new( number_of_children : i32, parent_node : Option<Node>) -> {
-        Node {
-            number_of_children : number_of_children,
-            leaves : Vec::new(),
-            children_nodes : Vec::new(),
-            parent_node : parent_node,
-            linked_sibling : None,
-            reverse_sibling : None
+
+impl Node{
+    pub fn new( number_of_children : usize, parent_node : Option<Node>) -> Node{
+        if !parent_node.is_none() {
+            Node {
+                number_of_children : number_of_children,
+                leaves : Vec::new(),
+                children_nodes : Vec::new(),
+                parent_node : Some(Box::new(parent_node.unwrap())),
+                linked_sibling : None,
+                reverse_sibling : None
+            }
+        }else {
+            Node {
+                number_of_children : number_of_children,
+                leaves : Vec::new(),
+                children_nodes : Vec::new(),
+                parent_node : None,
+                linked_sibling : None,
+                reverse_sibling : None
+            }
         }
     }
 
-    pub fn add_sibling(&self, sibling_node : Node) -> {
-        &self.linked_sibling = Some(sibling_node);
-    }
+    pub fn add_leaf(&mut self, leaf : Leaf)  {
+        let mut flat_leaf_vector_copy : Vec<String> = Vec::new();
+        for leaf in self.leaves.iter() {
+            flat_leaf_vector_copy.push(leaf.get_value());
+        }
+        flat_leaf_vector_copy.push(leaf.get_value());
+        flat_leaf_vector_copy.sort_by(LexicalSort::get_lexical_sort());
 
-    pub fn set_reverse_sibling(&self, reverse_sibling : Node){
-        &self.reverse_sibling = Some(reverse_sibling);
-    }
+        let mut new_leaf_vector = Vec::new();
 
-    pub fn get_reverse_sibling(&self) -> Node {
-        &self.reverse_sibling.unwrap()
+        for flat_leaf in flat_leaf_vector_copy.iter() {
+            
+            new_leaf_vector.push(Leaf::new(flat_leaf.clone()))
+        }
+        
+        self.leaves = new_leaf_vector;
+    }    
+    
+    pub fn set_sibling_node(&mut self, sibling_node : Node) {
+        self.linked_sibling=Some(Box::new(sibling_node));
     }
     
-    pub fn get_number_of_leaves(&self) => i32 {
-        &self.leaves.len()
+    pub fn get_sibbling_node(&self) -> Node {
+        *(self.linked_sibling.clone().unwrap())
+    }
+
+    pub fn add_children(&mut self, children : Vec<Node>) {
+        if self.children_nodes.is_empty() {
+            self.children_nodes = children;
+        } else {
+            let mut temp_child_vec = self.children_nodes.clone();
+            temp_child_vec.extend(children.clone());
+            self.children_nodes = temp_child_vec;
+        }
+    }
+
+    pub fn get_children(&mut self) -> Vec<Node> {
+        self.children_nodes.clone()
+    }
+
+    pub fn get_flat_leaves(&self) -> Vec<String> {
+        let mut flat_leaf_vector : Vec<String> = Vec::new();
+        for leaf in self.leaves.iter() {
+            flat_leaf_vector.push(leaf.get_value());
+        }
+        flat_leaf_vector
     }
     
-    pub fn get_sibbling(&self) -> Node {
-        &self.linked_sibling.unwrap()
-    }
-
-    pub fn get_number_of_children(&self) -> i32{
-        &self.number_of_children
-    }
-
-    pub fn get_leaves(&self) -> Vec<Leaf> {
-        &self.leaves
-    }
-
-    pub fn get_children_nodes(&self){
-        &self.children_nodes
-    }
-
-    pub fn get_child_by_index(&self, index : i32) -> Node {
-        &self.children_nodes[index]
-    }
-
-    pub fn get_parent_node(&self) -> Node {
-        &self.parent_node.unwrap()
-    }
-
-    pub fn add_leaves(&self, leaves : Vec<Leaf>) -> {
-        &self.leaves = leaves;
-    }
-
-    pub fn add_leaf(&self, leaf : Leaf) -> {
-        // Have to figure out a good sorting algorithm here for sorting
-        let flat_leaf_list=flatten_node(&self.leaves);
-        flat_leaf_list.sort_by(natural_lexical_cmp)
-        //TODO: improve this algorithm here because this is really bad.
-        new_leaf_structure = Vec::new();
-        for flat_leaf in flat_leaf_list.iter() {
-            new_leaf_structure.push(Leaf::new(flat_leaf));
-        }
-        &self.leaves = new_leaf_structure;
-    }
     
-    pub fn set_sibling_node(&self, sibling_node : Node) {
-        &self.linked_sibling=Some(sibling_node);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn testing_sort() {
+        let mut test_node_1 = Node::new(3,None);
+        let mut test_node_2 = Node::new(3,None);
+        let test_leaf_1 = Leaf::new(String::from("abcd"));
+        let test_leaf_2 = Leaf::new(String::from("wxyz"));
+        let expected_leaf_order_1 = vec![String::from("abcd"),String::from("wxyz")];
+
+        test_node_1.add_leaf(test_leaf_1);
+        assert_eq!(test_node_1.leaves.len(),1);
+
+        test_node_1.add_leaf(test_leaf_2);
+        assert_eq!(test_node_1.leaves.len(),2);
+        assert_eq!(expected_leaf_order_1, test_node_1.get_flat_leaves());
+
+        let test_leaf_3 = Leaf::new(String::from("abcd"));
+        let test_leaf_4 = Leaf::new(String::from("wxyz"));
+        test_node_2.add_leaf(test_leaf_4);
+        test_node_2.add_leaf(test_leaf_3);
+        assert_eq!(expected_leaf_order_1, test_node_2.get_flat_leaves());
+
+
+        let mut test_node_3 = Node::new(3,None);
+        let test_leaf_5 = Leaf::new(String::from("aaaa"));
+        let test_leaf_6 = Leaf::new(String::from("bbbb"));
+        let test_leaf_7 = Leaf::new(String::from("cccc"));
+        let expected_leaf_order_2 = vec![String::from("aaaa"),String::from("bbbb"),String::from("cccc")];
+
+        test_node_3.add_leaf(test_leaf_7);
+        test_node_3.add_leaf(test_leaf_6);
+        test_node_3.add_leaf(test_leaf_5);
+
+        assert_eq!(expected_leaf_order_2, test_node_3.get_flat_leaves());
+        
+        let mut test_node_4 = Node::new(3,None);
+        let test_leaf_8 = Leaf::new(String::from("11"));
+        let test_leaf_9 = Leaf::new(String::from("12"));
+        let test_leaf_10 = Leaf::new(String::from("aa"));
+        let expected_leaf_order_3 = vec![String::from("aa"),String::from("11"),String::from("12")];
+
+        test_node_4.add_leaf(test_leaf_10);
+        test_node_4.add_leaf(test_leaf_9);
+        test_node_4.add_leaf(test_leaf_8);
+
+        assert_eq!(expected_leaf_order_3,test_node_4.get_flat_leaves());
+
     }
 
-    pub fn set_children_nodes(&self, children_nodes : Vec<Node>){
-        &self.children_nodes = children_nodes;
+    #[test]
+    fn testing_siblings() {
+        let mut test_sibbling_node_1 = Node::new(3,None);
+        let test_leaf_1 = Leaf::new(String::from("1"));
+        test_sibbling_node_1.add_leaf(test_leaf_1);
+        
+        let mut test_sibbling_node_2 = Node::new(3,None);
+        let test_leaf_2 = Leaf::new(String::from("2"));
+        test_sibbling_node_2.add_leaf(test_leaf_2);
+        test_sibbling_node_1.set_sibling_node(test_sibbling_node_2.clone());
+        assert_eq!(test_sibbling_node_2.get_flat_leaves(), test_sibbling_node_1.get_sibbling_node().get_flat_leaves());
+
     }
 
-    pub fn reset_children_parents(&self) {
-        for child in  &self.children_nodes.iter() {
-            child.set_parent(&self)
+    #[test]
+    fn testing_children_node(){
+        let mut test_parent_node_1 = Node::new(3,None);
+        let mut index = 0;
+        let mut test_children_nodes = Vec::new();
+        while index < 3 {
+            let mut indexed_node = Node::new(3,None);
+            indexed_node.add_leaf(Leaf::new(String::from(index.to_string())));
+            test_children_nodes.push(indexed_node);
+            index = index + 1;
         }
-    }
+        test_parent_node_1.add_children(test_children_nodes.clone());        
+        assert_eq!(test_children_nodes,test_parent_node_1.get_children());
 
-    pub fn set_parent(&self,parent_node : Node){
-        &self.parent_node = parent_node;
-    }        
+        let mut test_parent_node_2 = Node::new(3,None);
+        let mut test_children_nodes_2 = vec![Node::new(5,None),Node::new(4,None)];
+        let mut test_children_nodes_3 = vec![Node::new(4,None),Node::new(3,None)];
 
-    pub fn has_children(&self) : bool {
-        &self.children_nodes.len() > 0
-    }
-
-    pub fn has_parent(&self) : bool {
-        let has_parent = false;
-        match &self.parent_node {
-            None => {  } //Do Nothing
-            Some => has_parent = true
-        }
-        has_parent
-    }
-
-    pub fn get_flattened_leaves(&self) -> Vec<String> {
-        flatten_leaves(&self.leaves)
-    }
-
-    fn flatten_leaves(leaves : Vec<Leaf>) -> Vec<String> {
-        let flattened_leaves = Vec::new();
-        for leaf in leaves.iter() {
-            flattened_leaves.push(leaf.get_value());
-        }
-        flattened_leaves
+        test_parent_node_2.add_children(test_children_nodes_2.clone());
+        test_parent_node_2.add_children(test_children_nodes_3.clone());
+        let mut composite_test_children_nodes = test_children_nodes_2.extend(test_children_nodes_3.clone());
     }
 }
+
+
