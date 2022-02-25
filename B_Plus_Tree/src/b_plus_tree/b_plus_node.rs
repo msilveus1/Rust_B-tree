@@ -4,7 +4,6 @@ use crate::b_plus_tree::lexical_sort::LexicalSort;
 
 #[derive(Clone,Debug,PartialEq,Eq)]
 pub struct Node{
-    number_of_children : usize,
     leaves : Vec<Leaf>,
     children_nodes: Vec<Node>,
     parent_node : Option<Box<Node>>,
@@ -14,10 +13,9 @@ pub struct Node{
 
 
 impl Node{
-    pub fn new( number_of_children : usize, parent_node : Option<Node>) -> Node{
+    pub fn new(parent_node : Option<Node>) -> Node{
         if !parent_node.is_none() {
             Node {
-                number_of_children : number_of_children,
                 leaves : Vec::new(),
                 children_nodes : Vec::new(),
                 parent_node : Some(Box::new(parent_node.unwrap())),
@@ -26,7 +24,6 @@ impl Node{
             }
         }else {
             Node {
-                number_of_children : number_of_children,
                 leaves : Vec::new(),
                 children_nodes : Vec::new(),
                 parent_node : None,
@@ -92,8 +89,8 @@ mod tests {
     use super::*;
     #[test]
     fn testing_sort() {
-        let mut test_node_1 = Node::new(3,None);
-        let mut test_node_2 = Node::new(3,None);
+        let mut test_node_1 = Node::new(None);
+        let mut test_node_2 = Node::new(None);
         let test_leaf_1 = Leaf::new(String::from("abcd"));
         let test_leaf_2 = Leaf::new(String::from("wxyz"));
         let expected_leaf_order_1 = vec![String::from("abcd"),String::from("wxyz")];
@@ -112,7 +109,7 @@ mod tests {
         assert_eq!(expected_leaf_order_1, test_node_2.get_flat_leaves());
 
 
-        let mut test_node_3 = Node::new(3,None);
+        let mut test_node_3 = Node::new(None);
         let test_leaf_5 = Leaf::new(String::from("aaaa"));
         let test_leaf_6 = Leaf::new(String::from("bbbb"));
         let test_leaf_7 = Leaf::new(String::from("cccc"));
@@ -124,7 +121,7 @@ mod tests {
 
         assert_eq!(expected_leaf_order_2, test_node_3.get_flat_leaves());
         
-        let mut test_node_4 = Node::new(3,None);
+        let mut test_node_4 = Node::new(None);
         let test_leaf_8 = Leaf::new(String::from("11"));
         let test_leaf_9 = Leaf::new(String::from("12"));
         let test_leaf_10 = Leaf::new(String::from("aa"));
@@ -140,11 +137,11 @@ mod tests {
 
     #[test]
     fn testing_siblings() {
-        let mut test_sibbling_node_1 = Node::new(3,None);
+        let mut test_sibbling_node_1 = Node::new(None);
         let test_leaf_1 = Leaf::new(String::from("1"));
         test_sibbling_node_1.add_leaf(test_leaf_1);
         
-        let mut test_sibbling_node_2 = Node::new(3,None);
+        let mut test_sibbling_node_2 = Node::new(None);
         let test_leaf_2 = Leaf::new(String::from("2"));
         test_sibbling_node_2.add_leaf(test_leaf_2);
         test_sibbling_node_1.set_sibling_node(test_sibbling_node_2.clone());
@@ -154,11 +151,11 @@ mod tests {
 
     #[test]
     fn testing_children_node(){
-        let mut test_parent_node_1 = Node::new(3,None);
+        let mut test_parent_node_1 = Node::new(None);
         let mut index = 0;
         let mut test_children_nodes = Vec::new();
         while index < 3 {
-            let mut indexed_node = Node::new(3,None);
+            let mut indexed_node = Node::new(None);
             indexed_node.add_leaf(Leaf::new(String::from(index.to_string())));
             test_children_nodes.push(indexed_node);
             index = index + 1;
@@ -166,9 +163,9 @@ mod tests {
         test_parent_node_1.add_children(test_children_nodes.clone());        
         assert_eq!(test_children_nodes,test_parent_node_1.get_children());
 
-        let mut test_parent_node_2 = Node::new(3,None);
-        let mut test_children_nodes_2 = vec![Node::new(5,None),Node::new(4,None)];
-        let mut test_children_nodes_3 = vec![Node::new(4,None),Node::new(3,None)];
+        let mut test_parent_node_2 = Node::new(None);
+        let mut test_children_nodes_2 = vec![Node::new(None),Node::new(None)];
+        let mut test_children_nodes_3 = vec![Node::new(None),Node::new(None)];
 
         test_parent_node_2.add_children(test_children_nodes_2.clone());
         test_parent_node_2.add_children(test_children_nodes_3.clone());
