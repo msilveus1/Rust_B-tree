@@ -3,19 +3,19 @@
 version = 3
 
 [[package]]
-name = "B_Plus_Tree"
+name = "any_ascii"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70033777eb8b5124a81a1889416543dddef2de240019b674c81285a2635a7e1e"
+
+[[package]]
+name = "b_plus_tree"
 version = "0.1.0"
 dependencies = [
  "lexical-sort",
  "termion",
  "tui",
 ]
-
-[[package]]
-name = "any_ascii"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70033777eb8b5124a81a1889416543dddef2de240019b674c81285a2635a7e1e"
 
 [[package]]
 name = "bitflags"
