@@ -47,9 +47,11 @@ impl<T : Ord + Clone> BPlusNode<T> {
     pub fn add_leaf(&mut self, leaf_value : T) {
         self.node_leaves.push(leaf_value);
         self.node_leaves.sort();
-        // let sort_leaf_vec = self.node_leaves.clone();
-        // sort_leaf_vec.sort();
-        // self.node_leaves = sorted_leaves;
+    }
+
+    pub fn add_child_node(&mut self, child_node : BPlusNode<T>){
+        self.children_nodes.push(child_node);
+        self.children_nodes.sort();
     }
 }
 
@@ -99,5 +101,13 @@ mod tests {
         test_node.add_leaf(6);
         assert_eq!(test_node.get_node_leaves(),final_leaf_vec);
     }
-
+    #[test]
+    fn test_adding_children(){
+        let mut test_node = BPlusNode::new(vec![1,2,3,4,5], None, Vec::new());
+        let child_node = BPlusNode::new(vec![1,3,21,15,22,34], None, Vec::new());
+        test_node.add_child_node(child_node.clone());
+        assert_eq!(test_node.get_children_nodes(),vec![child_node.clone()]);
+        let child_node_2 = BPlusNode::new(vec![1,5,10,2,7,9], None, Vec::new());
+        test_node.add_child_node(child_node_2.clone());
+    }
 }
