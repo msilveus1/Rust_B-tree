@@ -107,7 +107,5 @@ mod tests {
         let child_node = BPlusNode::new(vec![1,3,21,15,22,34], None, Vec::new());
         test_node.add_child_node(child_node.clone());
         assert_eq!(test_node.get_children_nodes(),vec![child_node.clone()]);
-        let child_node_2 = BPlusNode::new(vec![1,5,10,2,7,9], None, Vec::new());
-        test_node.add_child_node(child_node_2.clone());
     }
 }
