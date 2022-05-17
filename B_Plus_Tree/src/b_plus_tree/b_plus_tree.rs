@@ -6,6 +6,7 @@ pub struct BPlusTree<T> {
     degree : usize,
 }
 
+
 impl<T : Ord + Clone> BPlusTree<T> {
     pub fn new(root_node : Option<BPlusNode<T>>, degree : usize) -> BPlusTree<T> {        
         if !root_node.is_none() {
@@ -19,8 +20,26 @@ impl<T : Ord + Clone> BPlusTree<T> {
         }
     }
 
-    pub fn add_leaf(&self, leaf_value : T){
+    pub fn add_leaf(&mut self, leaf_value : T){
+        let mut current_node = self.root_node.clone().unwrap();
+        let mut current_node_leaves = self.root_node.clone().unwrap().get_node_leaves();
+        while current_node.has_children() {
+            let mut child_index = 0;
+            for current_leaf in current_node_leaves.iter() {
+                if leaf_value < *current_leaf {
+                    break;
+                } else {
+                    child_index = child_index + 1;
+                }
+            }
+            current_node = current_node.get_children_nodes()[child_index].clone();
+            current_node_leaves = current_node.clone().get_node_leaves();
+        }
+        if (current_node_leaves.len() + 1) >= self.degree {
 
+        }else {
+            current_node.add_leaf(leaf_value);
+        }
     }
 }
 
