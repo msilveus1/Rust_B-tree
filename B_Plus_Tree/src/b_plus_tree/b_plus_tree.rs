@@ -18,6 +18,10 @@ impl<T : Ord + Clone> BPlusTree<T> {
             degree : degree
         }
     }
+
+    pub fn add_leaf(&self, leaf_value : T){
+
+    }
 }
 
 #[cfg(test)]
@@ -36,5 +40,9 @@ mod tests {
             let test_b_plus_tree = BPlusTree::new(Some(test_root_node.clone()),3);
         });
         assert!(result.is_err());
+    }
+    #[test]
+    fn test(){
+        println!("hello")
     }
 }

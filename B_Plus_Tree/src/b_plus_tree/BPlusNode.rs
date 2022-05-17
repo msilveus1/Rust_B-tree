@@ -49,9 +49,20 @@ impl<T : Ord + Clone> BPlusNode<T> {
         self.node_leaves.sort();
     }
 
+    pub fn add_sibling(&mut self, sibling : BPlusNode<T>) {
+        self.sibling_node=Some(Box::new(sibling.clone()))
+    }
+
     pub fn add_child_node(&mut self, child_node : BPlusNode<T>){
         self.children_nodes.push(child_node);
         self.children_nodes.sort();
+    }
+
+    pub fn has_children(&self) -> bool {
+        !(self.children_nodes.len() == 0)
+    }
+    pub fn has_sibling(&self) -> bool {
+        !(self.sibling_node.is_none())
     }
 }
 
@@ -107,5 +118,21 @@ mod tests {
         let child_node = BPlusNode::new(vec![1,3,21,15,22,34], None, Vec::new());
         test_node.add_child_node(child_node.clone());
         assert_eq!(test_node.get_children_nodes(),vec![child_node.clone()]);
+    }
+    #[test]
+    fn test_has_children(){
+        let mut test_node = BPlusNode::new(vec![1,2,3,4,5], None, Vec::new());
+        let child_node = BPlusNode::new(vec![1,3,21,15,22,34], None, Vec::new());
+        assert!(!test_node.has_children());
+        test_node.add_child_node(child_node.clone());
+        assert!(test_node.has_children());
+    }
+    #[test]
+    fn test_has_sibling() {
+        let mut test_node = BPlusNode::new(vec![1,2,3,4,5], None, Vec::new());
+        let sibling_node = BPlusNode::new(vec![1,3,21,15,22,34], None, Vec::new());
+        assert!(!test_node.has_sibling());
+        test_node.add_sibling(sibling_node);
+        assert!(test_node.has_sibling());
     }
 }
