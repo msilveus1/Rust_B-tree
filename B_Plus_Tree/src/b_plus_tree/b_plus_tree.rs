@@ -36,6 +36,7 @@ impl<T : Ord + Clone> BPlusTree<T> {
             current_node_leaves = current_node.clone().get_node_leaves();
         }
         if (current_node_leaves.len() + 1) >= self.degree {
+            
 
         }else {
             current_node.add_leaf(leaf_value);
@@ -54,7 +55,7 @@ mod tests {
         panic::set_hook(Box::new(|_info| {
             // do nothing
         }));    
-        let test_root_node = BPlusNode::new(vec![443,43,43,4,4,3], None, Vec::new());
+        let test_root_node = BPlusNode::new(vec![443,43,43,4,4,3], None, None, Vec::new());
         let result = panic::catch_unwind(|| {
             let test_b_plus_tree = BPlusTree::new(Some(test_root_node.clone()),3);
         });
