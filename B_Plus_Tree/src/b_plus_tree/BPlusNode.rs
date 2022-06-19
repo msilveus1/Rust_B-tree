@@ -80,6 +80,17 @@ impl<T : Ord + Clone> BPlusNode<T> {
     pub fn has_parent(&self) -> bool {
         !(self.parent_node.is_none())
     }
+
+    pub fn delete_child_node(&mut self, delete_node : BPlusNode<T>) {
+        let mut index = 0;
+        for child in self.children_nodes.clone() {
+            if delete_node == child {
+                self.children_nodes.remove(index);
+                break;
+            } 
+        }
+    }
+
 }
 
 
@@ -159,4 +170,14 @@ mod tests {
         assert_eq!(test_parent_node.clone(),test_node.get_parent_node().unwrap());
         assert!(test_node.has_parent());
     }
+
+    #[test]
+    fn delete_child_node() {
+        let mut test_parent_node = BPlusNode::new(vec![1,2,3,4,5], None, None, Vec::new());
+        let mut test_node = BPlusNode::new(vec![1,2,3,4,5],None, Some(test_parent_node.clone()),Vec::new());
+        test_parent_node.add_child_node(test_node.clone());
+        test_parent_node.delete_child_node(test_node.clone());
+        assert_eq!(test_parent_node.get_children_nodes().len(),0);
+    }   
+
 }

@@ -52,7 +52,24 @@ impl<T : Ord + Clone> BPlusTree<T> {
         }
     }
 
+    fn get_tree_levels(&self) -> Vec<Vec<BPlusNode<T>>> {
+        let mut level = 1;
+        let mut tree_levels = Vec::new();
+        let mut current_nodes = vec![self.root_node.clone().unwrap()];
+        let mut next_level = Vec::new();
+        while level != self.depth + 1 {
+            for node in current_nodes.clone() {
+                next_level.append(&mut node.get_children_nodes().clone());
+            }
+            tree_levels.push(current_nodes.clone());
+            current_nodes = next_level.clone();
+            level = level + 1;
+        }
+        tree_levels
+    }
+
     pub fn add_leaf(&mut self, leaf_value : T){
+        
         let mut current_node = self.root_node.clone().unwrap();
         let mut current_node_leaves = self.root_node.clone().unwrap().get_node_leaves();
         while current_node.has_children() {
@@ -68,14 +85,29 @@ impl<T : Ord + Clone> BPlusTree<T> {
             current_node_leaves = current_node.clone().get_node_leaves();
         }
         if (current_node_leaves.len() + 1) >= self.degree {          
-            // split_
             let current_level = self.depth;
-            let current_level_split = true;
+            let mut current_level_split = true;
             let mut current_split_nodes = Vec::new();
+            let mut current_leaf_value = leaf_value.clone();
             while current_level_split {
+                current_node.add_leaf(current_leaf_value.clone());
                 current_split_nodes = BPlusTree::<T>::split_node(current_node.clone(), self.degree, current_level == self.depth);
-                
+                // Linking the bottom leaves
+                let mut left_child_node = current_split_nodes[0].clone();
+                let right_child_node = current_split_nodes[1].clone();
+                if  current_level == self.depth {
+                    left_child_node.add_sibling(right_child_node.clone());
+                    //TODO: Finish this with reverse node implementation
+                }  
+                let mut parent_node = current_node.get_parent_node().unwrap();
+                parent_node.delete_child_node(current_node.clone());
+                parent_node.add_child_node(left_child_node.clone());
+                parent_node.add_child_node(right_child_node.clone());
+                current_leaf_value = current_split_nodes[2].get_node_leaves()[0].clone();
+                current_node = parent_node;
+                current_level_split = current_node.get_node_leaves().len() + 1 >= self.degree;
             }
+            current_node.add_leaf(current_leaf_value.clone());
         }else {
             current_node.add_leaf(leaf_value);
         }
@@ -114,10 +146,13 @@ mod tests {
 
     #[test]
     fn test_adding_leaf_under_degree(){
-        let test_root_node = BPlusNode::new(vec![3], None, None, Vec::new());
-        let test_b_plus_tree = BPlusTree::new(Some(test_root_node.clone()),3);
-        let mut x = [1,2,3];
-        println!("Test");
-        println!("{:?}", &x[..2])
+        let mut test_root_node = BPlusNode::new(vec![3], None, None, Vec::new());
+        let mut test_b_plus_tree = BPlusTree::new(Some(test_root_node.clone()),3);
+        let test_leaf_1 = 5;
+        test_b_plus_tree.add_leaf(test_leaf_1.clone());
+        let test_tree_levels = test_b_plus_tree.get_tree_levels();
+        println!("{:?}",test_tree_levels);
+
+        
     }
 }
